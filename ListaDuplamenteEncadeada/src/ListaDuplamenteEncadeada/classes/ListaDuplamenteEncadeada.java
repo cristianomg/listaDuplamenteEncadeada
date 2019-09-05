@@ -7,7 +7,7 @@ package ListaDuplamenteEncadeada.classes;
 
 import Lista.classes.Lista;
 import java.util.Iterator;
-import java.util.function.Consumer;
+
 
 /**
  *
@@ -34,134 +34,200 @@ public class ListaDuplamenteEncadeada<T> implements Lista<T>{
 
     @Override
     public void adicionar(T elemento) {
-        NoDuplo novoNo = new NoDuplo(elemento);
-        if (inicioCabeca.getProximo().equals(fimCabeca)){
-            inicioCabeca.setProximo(novoNo);
-            fimCabeca.setAnterior(novoNo);
-            inicio = novoNo;
-            fim = novoNo;
-        }
-        else{
-            novoNo.setAnterior(fim);
-            fim.setProximo(novoNo);
-            fim = novoNo;
-            fimCabeca.setAnterior(novoNo);
-        }
-        tamanho++;
+    	NoDuplo<T> novoNo = new NoDuplo<>(elemento);
+    	NoDuplo<T> anterior = fimCabeca.getAnterior();
+    	novoNo.setProximo(fimCabeca);
+    	fimCabeca.setAnterior(novoNo);
+    	anterior.setProximo(novoNo);
+    	novoNo.setAnterior(anterior);
+    	fim = novoNo;
+    	inicio = inicioCabeca.getProximo();
+    	tamanho++;
     }
     
     @Override
     public void adicionarNoInicio(T elemento) {
-        if (inicioCabeca.getProximo().equals(fimCabeca)){
-            this.adicionar(elemento);
-        }
-        else{
-            NoDuplo novoNo = new NoDuplo(elemento);
-            inicioCabeca.setProximo(novoNo);
-            novoNo.setProximo(inicio);
-            inicio.setAnterior(novoNo);
-            inicio = novoNo;
-            tamanho++;
-        }
+    	NoDuplo<T> novoNo = new NoDuplo<>(elemento);
+    	NoDuplo<T> proximo = inicioCabeca.getProximo();
+    	inicioCabeca.setProximo(novoNo);
+    	novoNo.setProximo(proximo);
+    	novoNo.setAnterior(inicioCabeca);
+    	proximo.setAnterior(novoNo);
+    	inicio = novoNo;
+    	tamanho++;
     }
-
     @Override
     public void adicionarNoFim(T elemento) {
-        NoDuplo novoNo = new NoDuplo(elemento);
-        if (inicioCabeca.getProximo().equals(fimCabeca)){
-            inicio = novoNo;
-            fim = novoNo;
-            inicioCabeca.setProximo(novoNo);
-            fimCabeca.setAnterior(novoNo);
-        }
-        else{
-            novoNo.setAnterior(fim);
-            fim.setProximo(novoNo);
-            fimCabeca.setAnterior(novoNo);
-            fim = novoNo;
-            tamanho++;
-        }
-    }
+    	NoDuplo<T> novoNo = new NoDuplo<>(elemento);
+    	NoDuplo<T> anterior = fimCabeca.getAnterior();
+    	anterior.setProximo(novoNo);
+    	novoNo.setAnterior(anterior);
+    	novoNo.setProximo(fimCabeca);
+    	fimCabeca.setAnterior(novoNo);
+        fim = novoNo;
+    	tamanho++;
+    	}
 
     @Override
-    public void adicionar(T elemento, int posicao) {
-        NoDuplo novoNo = new NoDuplo(elemento);
+    public void adicionar(T elemento, int posicao) throws NullPointerException{
+        NoDuplo<T> novoNo = new NoDuplo<>(elemento);
         if (posicao==0){
             this.adicionarNoInicio(elemento);
         }
-        else if (posicao==tamanho-1){
-            this.adicionarNoFim(elemento);
+        else if (posicao == tamanho) {
+        	this.adicionarNoFim(elemento);	
+        }
+        else if (posicao < tamanho) {
+        	int meio = tamanho / 2;
+        	if	(posicao < meio) {
+            	NoDuplo<T> atual = inicio;
+            	for(int i= 0; i < posicao; i++) {
+            		atual = atual.getProximo();
+            	}
+            	NoDuplo<T> anterior = atual.getAnterior();
+            	anterior.setProximo(novoNo);
+            	novoNo.setAnterior(anterior);
+            	novoNo.setProximo(atual);
+            	atual.setAnterior(novoNo);	
+        	}
+        	else {
+        		NoDuplo<T> atual = fim;
+        		for(int i= tamanho-1; i> posicao; i--) {
+        			atual = atual.getAnterior();
+        		}
+        		NoDuplo<T> anterior = atual.getAnterior();
+        		novoNo.setAnterior(anterior);
+        		novoNo.setProximo(atual);
+        		atual.setAnterior(novoNo);
+        		anterior.setProximo(novoNo);
+        	}
+        	tamanho ++;
         }
         else{
-            int meio = this.tamanho/2;
-            if (posicao >= meio){
-                NoDuplo noAtual = fim;
-                for(int i = tamanho-1; i>posicao; i--){
-                    noAtual = noAtual.getAnterior();
-                }
-                novoNo.setAnterior(noAtual.getAnterior());
-                noAtual.getAnterior().setProximo(novoNo);
-                noAtual.setAnterior(novoNo);
-                novoNo.setProximo(noAtual);
-            }
-            else{
-                NoDuplo noAtual = inicio;
-                for (int i =0; i>posicao; i++){
-                   noAtual.getProximo();
-                }
-                novoNo.setProximo(noAtual);
-                novoNo.setAnterior(noAtual.getAnterior());
-                noAtual.setAnterior(novoNo);
-            }
-            tamanho++;
-    }
-
+            throw new NullPointerException();
+        }
     }
     
 
     @Override
-    public T remover(int posicao) {
-        return null;
+    public T remover(int posicao) throws NullPointerException {
+        T result = null;
+        if (posicao==0){
+            result = this.removerNoInicio();
+        }
+        else if (posicao == tamanho-1) {
+            result = this.removerNoFim();
+        }
+        else if (posicao < tamanho-1) {
+  
+        	int meio = tamanho-1 / 2;
+        	if(posicao < meio) {
+                    NoDuplo<T> atual = inicio;
+                    for(int i= 0; i < posicao; i++) {
+                            atual = atual.getProximo();
+                    }
+                    result = atual.getElemento();
+                    NoDuplo<T> anterior = atual.getAnterior();
+                    NoDuplo<T> proximo = atual.getProximo();
+                    anterior.setProximo(proximo);
+                    proximo.setAnterior(anterior);
+        	}
+        	else {
+                    NoDuplo<T> atual = fim;
+                    for(int i= tamanho-1; i> posicao; i--) {
+                            atual = atual.getAnterior();
+                    }
+                    result = atual.getElemento();
+                       NoDuplo<T> anterior = atual.getAnterior();
+                    NoDuplo<T> proximo = atual.getProximo();
+                    anterior.setProximo(proximo);
+                    proximo.setAnterior(anterior);
+        	}
+        	tamanho --;
+        }
+        else{
+            throw new NullPointerException();
+        }
+        return result;
     }
 
     @Override
     public T removerNoInicio() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        NoDuplo<T> result = inicio;
+        NoDuplo<T> proximo = inicio.getProximo();
+        inicioCabeca.setProximo(proximo);
+        proximo.setAnterior(inicioCabeca);
+        inicio = proximo;
+        tamanho --;
+        return result.getElemento();
     }
 
     @Override
     public T removerNoFim() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        NoDuplo<T> result = fim;
+        NoDuplo<T> anterior = fim.getAnterior();
+        fimCabeca.setAnterior(anterior);
+        anterior.setProximo(fimCabeca);
+        fim = anterior;
+        tamanho --;
+        return result.getElemento();
+
     }
 
     @Override
-    public T buscar(int posicao) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public T buscar(int posicao) throws NullPointerException{
+        int meio = tamanho/2;
+        if (posicao < meio){
+            NoDuplo<T> atual = inicio;        
+            for (int i=0; i<posicao; i++){
+                atual = atual.getProximo();
+            }
+            return atual.getElemento();
+        }
+        else if (posicao < tamanho){
+            NoDuplo<T> atual = fim;
+            for (int i= tamanho-1; i> posicao; i--){
+                atual = atual.getAnterior();
+            }
+            return atual.getElemento();
+        }
+        else{
+            throw new NullPointerException();
+        }
+
     }
 
     @Override
     public int existe(T elemento) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        NoDuplo<T> atual = inicio;
+        for (int i=0; i<tamanho; i++){
+            if (atual.getElemento() == elemento){
+                return i;
+            }
+            atual = atual.getProximo();
+        }
+        return -1;
     }
 
     @Override
     public void limpar() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        this.tamanho= 0;
+    	this.inicio = null;
+    	this.fim = null;
+        this.inicioCabeca.setProximo(fimCabeca);
+        this.fimCabeca.setAnterior(inicioCabeca);
+
     }
 
     @Override
     public int tamanho() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return tamanho;
     }
 
     @Override
     public Iterator<T> iterator() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return new IteradorListaDuplamenteEncadeada<>(this.inicio);
     }
 
-    @Override
-    public void forEach(Consumer<? super T> action) {
-        Lista.super.forEach(action); //To change body of generated methods, choose Tools | Templates.
-    }
 }
 

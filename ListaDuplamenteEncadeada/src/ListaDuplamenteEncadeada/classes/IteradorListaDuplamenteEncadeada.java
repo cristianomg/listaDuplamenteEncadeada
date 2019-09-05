@@ -21,7 +21,7 @@ public class IteradorListaDuplamenteEncadeada<T> implements Iterator<T>{
 
     @Override
     public boolean hasNext() {
-        return atual != null;
+        return atual.getElemento() != null;
     }
 
     @Override
