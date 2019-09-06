@@ -13,7 +13,7 @@ import java.util.UUID;
  * @author cristiano pc
  */
 public class Pessoa{
-    private static int quantidade = 0;
+    private static int quantidade = 10000;
     private int codigo;
     private final String nome;
     private final ListaDuplamenteEncadeada<Bem> listaBens = new ListaDuplamenteEncadeada();
@@ -34,7 +34,8 @@ public class Pessoa{
     }
     public void adicionarBem(Bem bem) throws Exception{
         boolean contem = false;
-        for(Bem b: getListaBens()){
+        if (listaBens.tamanho() >= 1){
+            for(Bem b: getListaBens()){
             if (bem.getCodigo()== b.getCodigo()){
                 contem = true;
             }
@@ -45,12 +46,22 @@ public class Pessoa{
         else{
             throw new Exception("Bem já cadastrado");
         }
+        }
+        else{
+            listaBens.adicionar(bem);
+        }
+
     }
     public float valorTotalBens(){
         float valorFinal = 0;
-        for(Bem b: this.listaBens){
+        try{
+            for(Bem b: this.listaBens){
             valorFinal += b.getValor();
         }
+        }
+        catch(NullPointerException e){
+        }
+
         return valorFinal;
     }
 }

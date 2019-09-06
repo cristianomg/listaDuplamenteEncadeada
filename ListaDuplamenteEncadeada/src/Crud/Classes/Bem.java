@@ -10,14 +10,14 @@ package Crud.Classes;
  * @author cristiano pc
  */
 public class Bem {
-    private static int codigo;
+    private int codigo;
     private String nome;
     private double valor;
     
-    public Bem(String nome, double valor){
+    public Bem(int codigo, String nome, double valor){
+        this.codigo = codigo; 
         this.nome = nome;
         this.valor = valor;
-        codigo++;
     }
     public int getCodigo() {
         return codigo;
